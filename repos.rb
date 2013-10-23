@@ -1,26 +1,35 @@
 #!/usr/bin/env ruby -w
 
-require 'optparse'
-require 'osx/cocoa' # http://rubycocoa.sourceforge.net
-require 'pp'
+# MacRuby
+framework 'AppKit'
 
 options = { :query => false }
-OptionParser.new do |opts|
-  opts.banner = 'Usage: repos.rb [options]'
 
-  opts.on( '-q', '--query', 'Query rather than set positioning' ) do |q|
-    options[:query] = q
-  end
+if ARGV.include? '-q'
+  options[:query] = true
+end
 
-  opts.on( '-s', '--script', "Show the repositioning script but don't execute it" ) do |s|
-    options[:script] = s
-  end
+if ARGV.include? '-s'
+  options[:script] = true
+end
 
-  opts.on_tail '-h', '--help', 'Show this message' do
-    puts opts
-    exit
-  end
-end.parse!
+# require 'optparse'
+# OptionParser.new do |opts|
+#   opts.banner = 'Usage: repos.rb [options]'
+
+#   opts.on( '-q', '--query', 'Query rather than set positioning' ) do |q|
+#     options[:query] = q
+#   end
+
+#   opts.on( '-s', '--script', "Show the repositioning script but don't execute it" ) do |s|
+#     options[:script] = s
+#   end
+
+#   opts.on_tail '-h', '--help', 'Show this message' do
+#     puts opts
+#     exit
+#   end
+# end.parse!
 
 def first_window_of( s ) %Q{the first window of process "#{s}"} end
 def all_windows_of( s ) %Q{windows of process "#{s}"} end
@@ -130,7 +139,7 @@ ConfigurationForWidth = {
 }
 
 def do_apple_script(s)
-  if result = OSX::NSAppleScript.alloc.initWithSource(s).executeAndReturnError(nil)
+  if result = NSAppleScript.alloc.initWithSource(s).executeAndReturnError(nil)
     # Return an array of the values (AppleScript uses 1-based indexing)
     (1..result.numberOfItems).map do |i|
       result.descriptorAtIndex( i ).int32Value
@@ -140,8 +149,8 @@ end
 
 
 
-main_display_width = Integer( OSX::NSScreen.mainScreen.frame.width )
-main_display_height = Integer( OSX::NSScreen.mainScreen.frame.height )
+main_display_width = Integer( NSScreen.mainScreen.frame.size.width )
+main_display_height = Integer( NSScreen.mainScreen.frame.size.height )
 
 if config = ConfigurationForWidth[main_display_width]
   config = CommonConfiguration.merge config
