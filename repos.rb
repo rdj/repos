@@ -104,13 +104,13 @@ ConfigurationForWidth = {
     {
       :standard       => centered( dw, dh, 1600, 1200 ),
 
-      :adium_chat     => { :position => [ 0, 1083 ], :size => [ 501,  357 ] },
-      :adium_contacts => { :position => [0, MenuBarHeight], :size => [150, 397] },
-      :echofon        => { :size => [498, 560], :position => [2061, 516] },
-      :messages       => { :position => [  996,  440 ], :size => [  768,  512  ] },
-      :propane        => { :position => [ 2029,   MenuBarHeight ], :size => [  530, 1417  ] },
+      :adium_chat     => { :position => [ dw - 501 , dh - 357 ],     :size => [ 501,  357 ] },
+      :adium_contacts => { :position => [ dw - 200, MenuBarHeight],  :size => [ 200, 397] },
+      :echofon        => centered( dw, dh, 489, 1080 ),
+      :messages       => { :position => [ 996,      440 ],           :size => [  768,  512  ] },
+      :propane        => { :position => [ 0,        MenuBarHeight ], :size => [  530, 1417  ] },
 
-      :iterm          => { :position => [    0,  693 ], :size => [  554,  388  ] },
+      :iterm          => { :position => [ dw - 554,  693 ], :size => [  554,  388  ] },
 
       :terminal       => { :position => [694, MenuBarHeight],    :size => [1202, 1341]   },
     }
