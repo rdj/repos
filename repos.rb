@@ -81,7 +81,7 @@ CommonConfiguration = {
 PropertiesOfInterest = [ :position, :size ]
 
 MenuBarHeight = 22
-DockHeight = 60
+DockHeight = 64
 
 def center_horizontally( dw, ww )
   ( dw - ww ) / 2
