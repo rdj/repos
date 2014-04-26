@@ -131,6 +131,36 @@ ConfigurationForWidth = {
     :adium_contacts => { :position => [ 1533,  MenuBarHeight ], :size => [  150, 378  ] },
     :propane        => { :position => [    0,  MenuBarHeight ], :size => [  530, 980  ] },
   },
+  1440 => begin dw, dh = 1440, 900
+  {
+    :standard => begin ww = 1280
+    {
+      :position => [ center_horizontally( dw, ww ), MenuBarHeight ],
+      :size     => [ ww, dh - MenuBarHeight - DockHeight ]
+    } end,
+
+    :adium_contacts => begin ww = 150
+    {
+      :position => [ dw - ww, MenuBarHeight ],
+      :size => [ ww, dh - MenuBarHeight - DockHeight - 350 ],
+    } end,
+
+    :adium_chat => begin ww, wh = 500, 350
+    {
+      :position => [ dw - ww, dh - wh - DockHeight ],
+      :size => [ ww, wh ]
+    } end,
+
+    :propane =>
+    {
+      :position => [ 0, MenuBarHeight ],
+      :size => [ 500, dh - MenuBarHeight - DockHeight ],
+    },
+
+    :messages => centered( dw, dh, 768, 512 ),
+    :echofon  => centered( dw, dh, 489, dh - MenuBarHeight - DockHeight ),
+
+  } end,
   1280 => {
     :standard       => { :position => [0, MenuBarHeight],      :size => [1280, 694]    },
 
