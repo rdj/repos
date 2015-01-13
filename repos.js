@@ -3,7 +3,7 @@
 "use strict";
 
 var scripting = Application.currentApplication();
-scripting.includeStandardAdditions = true
+scripting.includeStandardAdditions = true;
 
 var sys = Application('System Events');
 
@@ -93,12 +93,12 @@ function query() {
             props[proc] = {
                 size: getSize( proc ),
                 position: getPosition( proc ),
-            }
+            };
         }
     } );
 
     var config = {};
-    config[String(screenSize.width)] = props
+    config[String(screenSize.width)] = props;
 
     console.log( JSON.stringify( config ) );
 }
