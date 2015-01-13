@@ -34,6 +34,7 @@ end
 def first_window_of( s ) %Q{the first window of process "#{s}"} end
 def all_windows_of( s ) %Q{windows of process "#{s}"} end
 WindowsOfInterest = {
+  :_1password     => first_window_of('1Password 4'),
   :adium_chat     => first_window_of('Adium')   + ' whose name is not "Contacts"',
   :adium_contacts => first_window_of('Adium')   + ' whose name is "Contacts"',
   :chrome         => all_windows_of('Google Chrome'),
@@ -43,6 +44,7 @@ WindowsOfInterest = {
   :ical           => first_window_of('iCal'),
   :gitx           => all_windows_of( 'GitX' ),
   :googlecal      => first_window_of('Calendar'),
+  :propane        => first_window_of('HipChat'),
   :iphone_docs    => first_window_of('iPhone Pre-release Docs'),
   :iterm          => first_window_of('iTerm'),
   :itunes         => first_window_of('iTunes'),
@@ -50,9 +52,10 @@ WindowsOfInterest = {
   :mail           => first_window_of('Mail'),
   :mailplane      => first_window_of('Mailplane 3'),
   :messages       => first_window_of('Messages'),
-  :propane        => first_window_of('Propane'),
+  #:propane        => first_window_of('Propane'),
   :rails_api      => first_window_of('Rails API'),
   :safari         => first_window_of('Safari'),
+  :things         => first_window_of('Things'),
   :terminal       => first_window_of('Terminal'),
   :tweetie        => first_window_of('Tweetie') + ' whose name is "Tweetie"',
   :xcode          => all_windows_of('Xcode'),
@@ -60,6 +63,7 @@ WindowsOfInterest = {
 
 CommonConfiguration = {
   :standard    => { :position => [0, 0], :size => [1024, 768] }, # override this
+  :_1password  => :standard,
   :chrome      => :standard,
   :chromium    => :standard,
   :firefox     => :standard,
@@ -98,6 +102,10 @@ def centered( dw, dh, ww, wh )
   { :position => [ wx, wy ], :size => [ ww, wh ] }
 end
 
+def maxheight( dh )
+  dh - MenuBarHeight - DockHeight
+end
+
 ConfigurationForWidth = {
   2560 => begin # 2560x1440
      dw, dh = 2560, 1440
@@ -108,11 +116,12 @@ ConfigurationForWidth = {
       :adium_contacts => { :position => [ dw - 200, MenuBarHeight],  :size => [ 200, 397] },
       :echofon        => centered( dw, dh, 489, 1080 ),
       :messages       => { :position => [ 996,      440 ],           :size => [  768,  512  ] },
-      :propane        => { :position => [ 0,        MenuBarHeight ], :size => [  530, 1417  ] },
+      :propane        => { :position => [ 0,        MenuBarHeight ], :size => [  768, maxheight( dh ) ] },
 
       :iterm          => { :position => [ dw - 554,  693 ], :size => [  554,  388  ] },
 
       :terminal       => { :position => [694, MenuBarHeight],    :size => [1202, 1341]   },
+      :things         => centered( dw, dh, 768, 512 ),
     }
   end,
   1920 => {
@@ -123,6 +132,7 @@ ConfigurationForWidth = {
     :propane        => { :position => [ 1388, 836 ], :size => [  530,  362  ] },
     :echofon        => { :position => [ 1418, 293 ], :size => [  501,  550  ] },
     :terminal       => { :position => [  320,  72 ], :size => [ 1281, 1069  ] },
+    :things         => centered( dw, dh, 768, 512 ),
   },
   1680 => {
     :standard       => { :position => [  200,  MenuBarHeight ], :size => [ 1280, 950  ] },
@@ -136,13 +146,13 @@ ConfigurationForWidth = {
     :standard => begin ww = 1280
     {
       :position => [ center_horizontally( dw, ww ), MenuBarHeight ],
-      :size     => [ ww, dh - MenuBarHeight - DockHeight ]
+      :size     => [ ww, maxheight( dh ) ]
     } end,
 
     :adium_contacts => begin ww = 150
     {
       :position => [ dw - ww, MenuBarHeight ],
-      :size => [ ww, dh - MenuBarHeight - DockHeight - 350 ],
+      :size => [ ww, maxheight( dh ) - 350 ],
     } end,
 
     :adium_chat => begin ww, wh = 500, 350
@@ -154,11 +164,12 @@ ConfigurationForWidth = {
     :propane =>
     {
       :position => [ 0, MenuBarHeight ],
-      :size => [ 500, dh - MenuBarHeight - DockHeight ],
+      :size => [ 500, maxheight( dh ) ],
     },
 
     :messages => centered( dw, dh, 768, 512 ),
-    :echofon  => centered( dw, dh, 489, dh - MenuBarHeight - DockHeight ),
+    :echofon  => centered( dw, dh, 489, maxheight( dh ) ),
+    :things   => centered( dw, dh, 768, 512 ),
 
   } end,
   1280 => {
