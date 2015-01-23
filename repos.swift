@@ -2,64 +2,6 @@
 
 import AppKit
 
-// The CGWindow APIs are the easiest way to enumerate current windows
-// but sadly this is completely disconnected from the accessibility
-// APIs that let you actually resize/move them. Disconnected to the
-// point that there's no way to correlate the windows between the two
-// lists, in fact.
-class RWindow {
-    class var windows:[RWindow] {
-        let kCGNullWindowID = CGWindowID(0) // CGWindow.h uses a #define
-    
-        var windowsRaw:[AnyObject] = CGWindowListCopyWindowInfo(
-                CGWindowListOption(
-                    kCGWindowListOptionOnScreenOnly
-                    | kCGWindowListExcludeDesktopElements
-                ),
-                kCGNullWindowID
-            ).takeRetainedValue()
-        
-        return windowsRaw.map { RWindow( $0 as [NSObject: AnyObject] ) }.filter { $0.isVisible }
-    }
-    
-    private let dict:[NSObject: AnyObject]
-    
-    init( _ d:[NSObject: AnyObject] ) {
-        self.dict = d
-    }
-
-    var alpha:CGFloat {
-        return self.dict[kCGWindowAlpha] as CGFloat
-    }
-
-    var bounds:CGRect {
-        var boundsDict = self.dict[kCGWindowBounds] as [NSObject: AnyObject]
-        var b = CGRect()
-        CGRectMakeWithDictionaryRepresentation( boundsDict, &b )
-        return b
-    }
-    
-    var id:Int {
-        return self.dict[kCGWindowNumber] as Int
-    }
-
-    var isVisible:Bool {
-        return alpha > CGFloat(0)
-    }
-
-    var name:String {
-        return ( self.dict[kCGWindowName] as? String ) ?? ""
-    }
-
-    var owner:String {
-        return self.dict[kCGWindowOwnerName] as String
-    }
-
-    var pid:Int {
-        return self.dict[kCGWindowOwnerPID] as Int
-    }
-}
-
 // The AXUIElement APIs are the assistive / accessibility APIs that do
 // actually let you do stuff like move stuff around on the screen.
 // They are ancient and annoying CF APIs that lack modern annotation
@@ -191,43 +133,23 @@ class RAXWindow {
     }
 }
 
-var windows:[RWindow] = RWindow.windows
+var apps = NSWorkspace.sharedWorkspace().runningApplications
 
-var pidsDone = [Int]()
+for app in apps {
+    var printed = false
 
-for window in windows {
-    println( "\(window.pid).\(window.id) \(window.owner) \"\(window.name)\" \(window.bounds)" )
-
-    if contains( pidsDone, window.pid ) {
-        continue
-    }
-    pidsDone.append( window.pid )
-
-    var proc = RAXProcess( window.pid )
-    for w in proc.windows {
-        println( "BEFORE \(proc.pid) \"\(w.title)\": canMove:\(w.canMove) position:\(w.position) canResize:\(w.canResize) size:\(w.size)" )
-        if w.canChange {
-            w.position = CGPointMake( 480, 99 )
-            w.size = CGSizeMake( 1600, 1200 )
+    var proc = RAXProcess( Int(app.processIdentifier) )
+    for w in proc.windows.filter( { $0.canChange } ) {
+        if !printed {
+            println( "\(app.processIdentifier) \(app.localizedName!!)" )
         }
-        println( "AFTER \(proc.pid) \"\(w.title)\": canMove:\(w.canMove) position:\(w.position) canResize:\(w.canResize) size:\(w.size)" )
-    }
-    
 
-    // var axapp = AXUIElementCreateApplication( pid_t(window.pid) ).takeRetainedValue()
-    // var axwindowout: Unmanaged<AnyObject>? = nil
-    // var axerr = AXUIElementCopyAttributeValue(
-    //     axapp,
-    //     "AXMainWindow",
-    //     &axwindowout )
-    // if axerr == AXError(kAXErrorSuccess) {
-    //     if ( nil == axwindowout ) {
-    //         continue
-    //     }
-    //     let axwindow = axwindowout!.takeRetainedValue() as AXUIElement
-    //     println( axwindow )
-    // }
-    
+        println( " - (\(Int(w.position.x)), \(Int(w.position.y))) \(Int(w.size.width))x\(Int(w.size.height)) <\(w.title)>" )
+        // if w.canChange {
+        //     w.position = CGPointMake( 480, 99 )
+        //     w.size = CGSizeMake( 1600, 1200 )
+        // }
+    }
 }
 
 
