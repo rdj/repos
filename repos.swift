@@ -87,7 +87,7 @@ class RAXProcess {
             0,
             maxWindows,
             &out
-        );
+        )
         if AXError(kAXErrorSuccess) != axerr || nil == out {
             return [RAXWindow]()
         }
@@ -102,6 +102,92 @@ class RAXWindow {
     
     init( _ handle:AXUIElement ) {
         self.handle = handle
+    }
+
+    var attributeNames:[String] {
+        var out:Unmanaged<CFArray>? = nil
+        var axerr = AXUIElementCopyAttributeNames(
+            handle,
+            &out
+        )
+        if AXError(kAXErrorSuccess) != axerr || nil == out {
+            return [String]()
+        }
+        let names:[AnyObject] = out!.takeRetainedValue()
+        return names.map{ $0 as String }
+    }
+
+    private func getSettable( attr:String ) -> Bool {
+        var settable:Boolean = 0
+        AXUIElementIsAttributeSettable( handle, attr, &settable )
+        return 0 != settable
+    }
+
+    var canChange:Bool {
+        return self.canMove && self.canResize
+    }
+    
+    // #define kAXPositionAttribute				CFSTR("AXPosition")
+    private let kAXPositionAttribute = "AXPosition"
+
+    var canMove:Bool {
+        return getSettable( kAXPositionAttribute )
+    }
+
+    var position:CGPoint {
+        get {
+            var pt = CGPoint()
+            var out:Unmanaged<AnyObject>? = nil
+            let axerr = AXUIElementCopyAttributeValue( handle, kAXPositionAttribute, &out )
+            if AXError(kAXErrorSuccess) != axerr || nil == out {
+                return pt
+            }
+            var value = out!.takeRetainedValue() as AXValue
+            AXValueGetValue( value, kAXValueCGPointType, &pt )
+            return pt
+        }
+        set {
+            var pt = newValue
+            var value:AXValue = AXValueCreate( kAXValueCGPointType, &pt ).takeRetainedValue()
+            AXUIElementSetAttributeValue( handle, kAXPositionAttribute, value )
+        }
+    }
+
+    // #define kAXSizeAttribute				CFSTR("AXSize")
+    private let kAXSizeAttribute = "AXSize"
+
+    var canResize:Bool {
+        return getSettable( kAXSizeAttribute )
+    }
+
+    var size:CGSize {
+        get {
+            var size = CGSize()
+            var out:Unmanaged<AnyObject>? = nil
+            let axerr = AXUIElementCopyAttributeValue( handle, kAXSizeAttribute, &out )
+            if AXError(kAXErrorSuccess) != axerr || nil == out {
+                return size
+            }
+            var value = out!.takeRetainedValue() as AXValue
+            AXValueGetValue( value, kAXValueCGSizeType, &size )
+            return size
+        }
+        set {
+            var size = newValue
+            var value:AXValue = AXValueCreate( kAXValueCGSizeType, &size ).takeRetainedValue()
+            AXUIElementSetAttributeValue( handle, kAXSizeAttribute, value )
+        }
+    }
+    
+    // #define kAXTitleAttribute				CFSTR("AXTitle")
+    private let kAXTitleAttribute = "AXTitle"
+    var title:String {
+        var out:Unmanaged<AnyObject>? = nil
+        let axerr = AXUIElementCopyAttributeValue( handle, kAXTitleAttribute, &out )
+        if AXError(kAXErrorSuccess) != axerr || nil == out {
+            return ""
+        }
+        return out!.takeRetainedValue() as String
     }
 }
 
@@ -119,7 +205,12 @@ for window in windows {
 
     var proc = RAXProcess( window.pid )
     for w in proc.windows {
-        println( w.handle )
+        println( "BEFORE \(proc.pid) \"\(w.title)\": canMove:\(w.canMove) position:\(w.position) canResize:\(w.canResize) size:\(w.size)" )
+        if w.canChange {
+            w.position = CGPointMake( 480, 99 )
+            w.size = CGSizeMake( 1600, 1200 )
+        }
+        println( "AFTER \(proc.pid) \"\(w.title)\": canMove:\(w.canMove) position:\(w.position) canResize:\(w.canResize) size:\(w.size)" )
     }
     
 
@@ -128,10 +219,10 @@ for window in windows {
     // var axerr = AXUIElementCopyAttributeValue(
     //     axapp,
     //     "AXMainWindow",
-    //     &axwindowout );
+    //     &axwindowout )
     // if axerr == AXError(kAXErrorSuccess) {
     //     if ( nil == axwindowout ) {
-    //         continue;
+    //         continue
     //     }
     //     let axwindow = axwindowout!.takeRetainedValue() as AXUIElement
     //     println( axwindow )
