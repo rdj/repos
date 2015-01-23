@@ -6,28 +6,53 @@ import AppKit
 // actually let you do stuff like move stuff around on the screen.
 // They are ancient and annoying CF APIs that lack modern annotation
 // so are unwieldy to use from modern (ARC/Swift) code.
+//
+// RAX prefix for wrapping AXUIElement and associated stuff, which are
+// ancient CF APIs that don't even have ARC annotations, so they're a
+// bit unwieldy to use from Swift. Quick review:
+//
+// takeRetainedValue = Create/Copy Rule =
+//                     You called an API that returned a live object
+//                     that hasn't been autoreleased, so it's your job
+//                     to release it.
+//
+// takeUnretainedValue = Get Rule =
+//                       You called an API that returned a live object
+//                       that has been autoreleased, so you don't need
+//                       to worry about it unless it needs to live
+//                       past this runloop, in which case you'll have
+//                       to retain it.
+//
+
+// AXAttributeConstants.h uses #defines instead of real constants ...
+struct RAXAttributeConstants {
+    // #define kAXWindowsAttribute				CFSTR("AXWindows")
+    static let Windows = "AXWindows"
+    // #define kAXPositionAttribute				CFSTR("AXPosition")
+    static let Position = "AXPosition"
+    // #define kAXSizeAttribute				CFSTR("AXSize")
+    static let Size = "AXSize"
+    // #define kAXTitleAttribute				CFSTR("AXTitle")
+    static let Title = "AXTitle"
+}
+
 class RAXProcess {
     let pid:Int
     private let handle:AXUIElement
-    
+    private let maxWindows = 20
+        
     init( _ pid:Int ) {
         self.pid = pid
         self.handle = AXUIElementCreateApplication( pid_t( self.pid ) ).takeRetainedValue()
     }
 
-    lazy var windows:[RAXWindow] = self.fetchWindows()
-
-    private func fetchWindows() -> [RAXWindow] {
-        // AXAttributeConstants.h
-        // #define kAXWindowsAttribute				CFSTR("AXWindows")
-        let kAXWindowsAttribute = "AXWindows"
-        let maxWindows = 20
+    lazy var windows:[RAXWindow] = {
         var out:Unmanaged<CFArray>? = nil
         var axerr = AXUIElementCopyAttributeValues(
-            handle,
-            kAXWindowsAttribute,
+            self.handle,
+            RAXAttributeConstants.Windows,
             0,
-            maxWindows,
+            self.maxWindows,
             &out
         )
         if AXError(kAXErrorSuccess) != axerr || nil == out {
@@ -36,11 +61,11 @@ class RAXProcess {
 
         let handles:[AnyObject] = out!.takeRetainedValue()
         return handles.map{ RAXWindow( $0 as AXUIElement ) }
-    }
+    }()
 }
 
 class RAXWindow {
-    let handle:AXUIElement
+    private let handle:AXUIElement
     
     init( _ handle:AXUIElement ) {
         self.handle = handle
@@ -69,18 +94,15 @@ class RAXWindow {
         return self.canMove && self.canResize
     }
     
-    // #define kAXPositionAttribute				CFSTR("AXPosition")
-    private let kAXPositionAttribute = "AXPosition"
-
     var canMove:Bool {
-        return getSettable( kAXPositionAttribute )
+        return getSettable( RAXAttributeConstants.Position )
     }
 
     var position:CGPoint {
         get {
             var pt = CGPoint()
             var out:Unmanaged<AnyObject>? = nil
-            let axerr = AXUIElementCopyAttributeValue( handle, kAXPositionAttribute, &out )
+            let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Position, &out )
             if AXError(kAXErrorSuccess) != axerr || nil == out {
                 return pt
             }
@@ -91,22 +113,19 @@ class RAXWindow {
         set {
             var pt = newValue
             var value:AXValue = AXValueCreate( kAXValueCGPointType, &pt ).takeRetainedValue()
-            AXUIElementSetAttributeValue( handle, kAXPositionAttribute, value )
+            AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Position, value )
         }
     }
 
-    // #define kAXSizeAttribute				CFSTR("AXSize")
-    private let kAXSizeAttribute = "AXSize"
-
     var canResize:Bool {
-        return getSettable( kAXSizeAttribute )
+        return getSettable( RAXAttributeConstants.Size )
     }
 
     var size:CGSize {
         get {
             var size = CGSize()
             var out:Unmanaged<AnyObject>? = nil
-            let axerr = AXUIElementCopyAttributeValue( handle, kAXSizeAttribute, &out )
+            let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Size, &out )
             if AXError(kAXErrorSuccess) != axerr || nil == out {
                 return size
             }
@@ -117,15 +136,13 @@ class RAXWindow {
         set {
             var size = newValue
             var value:AXValue = AXValueCreate( kAXValueCGSizeType, &size ).takeRetainedValue()
-            AXUIElementSetAttributeValue( handle, kAXSizeAttribute, value )
+            AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Size, value )
         }
     }
     
-    // #define kAXTitleAttribute				CFSTR("AXTitle")
-    private let kAXTitleAttribute = "AXTitle"
     var title:String {
         var out:Unmanaged<AnyObject>? = nil
-        let axerr = AXUIElementCopyAttributeValue( handle, kAXTitleAttribute, &out )
+        let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Title, &out )
         if AXError(kAXErrorSuccess) != axerr || nil == out {
             return ""
         }
