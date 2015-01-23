@@ -1,5 +1,12 @@
 #!/usr/bin/env ruby -w
 
+# This continues to work, but MacRuby is no longer being maintained,
+# and RVM has a cow every time I upgrade it because of MacRuby, also
+# the ruby stdlib is broken in MacRuby for some reason, so things like
+# optparse don't work. Pretty annoying. Would like to retire this
+# venerable old script in favor of a less deprecated old rotting
+# approach.
+
 # MacRuby
 framework 'AppKit'
 

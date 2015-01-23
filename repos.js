@@ -1,5 +1,13 @@
 #!/usr/bin/env osascript -l JavaScript
 
+// Sadly, the automation bridge for javascript seems to be super buggy
+// in Yosemite. This script works most of the time, but sometimes the
+// system just decides it's going to fail all the automation calls. If
+// you then access automation from something other than osascript, the
+// system unconfuses itself and this script will start working again.
+// Pretty infuriating, cause this was pretty much exactly what I
+// wanted.
+
 "use strict";
 
 var scripting = Application.currentApplication();
