@@ -26,14 +26,14 @@ import AppKit
 
 // AXAttributeConstants.h uses #defines instead of real constants ...
 struct RAXAttributeConstants {
-    // #define kAXWindowsAttribute				CFSTR("AXWindows")
-    static let Windows = "AXWindows"
     // #define kAXPositionAttribute				CFSTR("AXPosition")
     static let Position = "AXPosition"
     // #define kAXSizeAttribute				CFSTR("AXSize")
     static let Size = "AXSize"
     // #define kAXTitleAttribute				CFSTR("AXTitle")
     static let Title = "AXTitle"
+    // #define kAXWindowsAttribute				CFSTR("AXWindows")
+    static let Windows = "AXWindows"
 }
 
 class RAXProcess {
