@@ -37,9 +37,9 @@ struct RAXAttributeConstants {
 }
 
 class RAXProcess {
-    let pid:Int
     private let handle:AXUIElement
     private let maxWindows = 20
+    let pid:Int
         
     init( _ pid:Int ) {
         self.pid = pid
@@ -84,12 +84,6 @@ class RAXWindow {
         return names.map{ $0 as String }
     }
 
-    private func getSettable( attr:String ) -> Bool {
-        var settable:Boolean = 0
-        AXUIElementIsAttributeSettable( handle, attr, &settable )
-        return 0 != settable
-    }
-
     var canChange:Bool {
         return self.canMove && self.canResize
     }
@@ -98,15 +92,26 @@ class RAXWindow {
         return getSettable( RAXAttributeConstants.Position )
     }
 
+    var canResize:Bool {
+        return getSettable( RAXAttributeConstants.Size )
+    }
+
+    private func getSettable( attr:String ) -> Bool {
+        var settable:Boolean = 0
+        AXUIElementIsAttributeSettable( handle, attr, &settable )
+        return 0 != settable
+    }
+
     var position:CGPoint {
         get {
-            var pt = CGPoint()
             var out:Unmanaged<AnyObject>? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Position, &out )
             if AXError(kAXErrorSuccess) != axerr || nil == out {
-                return pt
+                return CGPoint()
             }
             var value = out!.takeRetainedValue() as AXValue
+            
+            var pt = CGPoint()
             AXValueGetValue( value, kAXValueCGPointType, &pt )
             return pt
         }
@@ -117,19 +122,16 @@ class RAXWindow {
         }
     }
 
-    var canResize:Bool {
-        return getSettable( RAXAttributeConstants.Size )
-    }
-
     var size:CGSize {
         get {
-            var size = CGSize()
             var out:Unmanaged<AnyObject>? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Size, &out )
             if AXError(kAXErrorSuccess) != axerr || nil == out {
-                return size
+                return CGSize()
             }
             var value = out!.takeRetainedValue() as AXValue
+
+            var size = CGSize()
             AXValueGetValue( value, kAXValueCGSizeType, &size )
             return size
         }
