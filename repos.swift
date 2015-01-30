@@ -64,6 +64,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
         let dw = 1680, dh = 1050
         return [
             "standard"    : CGRect( x:200, y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
+            "EchofonLite" : CGRect( x:center_horizontally(  centered( dw, dh,  489, maxheight(dh) ),
             "HipChat"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:530,  height:maxheight(dh) ),
         ]
     }(),
