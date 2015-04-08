@@ -120,8 +120,8 @@ class RAXWrapper {
         if AXError(kAXErrorSuccess) != axerr || nil == out {
             return [String]()
         }
-        let names:[AnyObject] = out!.takeRetainedValue()
-        return names.map{ $0 as String }
+        let names = out!.takeRetainedValue() as! [AnyObject]
+        return names.map{ $0 as! String }
     }
 }
 
@@ -147,8 +147,8 @@ class RAXProcess: RAXWrapper {
             return [RAXWindow]()
         }
 
-        let handles:[AnyObject] = out!.takeRetainedValue()
-        return handles.map{ RAXWindow( $0 as AXUIElement ) }.filter{ $0.canChange }
+        let handles = out!.takeRetainedValue() as! [AnyObject]
+        return handles.map{ RAXWindow( $0 as! AXUIElement ) }.filter{ $0.canChange }
     }()
 }
 
@@ -182,7 +182,7 @@ class RAXWindow: RAXWrapper {
             if AXError(kAXErrorSuccess) != axerr || nil == out {
                 return CGPoint()
             }
-            var value = out!.takeRetainedValue() as AXValue
+            var value = out!.takeRetainedValue() as! AXValue
             
             var pt = CGPoint()
             AXValueGetValue( value, kAXValueCGPointType, &pt )
@@ -202,7 +202,7 @@ class RAXWindow: RAXWrapper {
             if AXError(kAXErrorSuccess) != axerr || nil == out {
                 return CGSize()
             }
-            var value = out!.takeRetainedValue() as AXValue
+            var value = out!.takeRetainedValue() as! AXValue
 
             var size = CGSize()
             AXValueGetValue( value, kAXValueCGSizeType, &size )
@@ -221,12 +221,12 @@ class RAXWindow: RAXWrapper {
         if AXError(kAXErrorSuccess) != axerr || nil == out {
             return ""
         }
-        return out!.takeRetainedValue() as String
+        return out!.takeRetainedValue() as! String
     }
 }
 
 func apps() -> [ NSRunningApplication ] {
-    let apps = NSWorkspace.sharedWorkspace().runningApplications as [ NSRunningApplication ]
+    let apps = NSWorkspace.sharedWorkspace().runningApplications as! [ NSRunningApplication ]
     return apps.filter { contains( procsOfInterest, $0.localizedName! ) }
 }
 
