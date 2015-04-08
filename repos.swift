@@ -70,8 +70,8 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
     }(),
 ];
 
-// The AXUIElement APIs are the assistive / accessibility APIs that do
-// actually let you do stuff like move stuff around on the screen.
+// The AXUIElement APIs are the assistive / accessibility APIs that
+// actually let you do stuff like move windows around on the screen.
 // They are ancient and annoying CF APIs that lack modern annotation
 // so are unwieldy to use from modern (ARC/Swift) code.
 //
