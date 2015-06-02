@@ -68,6 +68,14 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "HipChat"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:530,  height:maxheight(dh) ),
         ]
     }(),
+    1440 : {
+        let dw = 1440, dh = 900
+        return [
+            "standard"    : CGRect( x:center_horizontally( dw, 1280 ), y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
+            "EchofonLite" : centered( dw, dh, 489, maxheight( dh ) ),
+            "HipChat"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:500,  height:maxheight(dh) ),
+        ]
+    }(),
 ];
 
 // The AXUIElement APIs are the assistive / accessibility APIs that
