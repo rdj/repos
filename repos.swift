@@ -27,7 +27,7 @@ let procsOfInterest = [
 let MENU_BAR_HEIGHT = 22
 let DOCK_HEIGHT = 64
 
-func center_horizontally( dw:Int, ww:Int ) -> Int {
+func center_horizontally( dw:Int, _ ww:Int ) -> Int {
     return ( dw - ww ) / 2
 }
 
@@ -35,13 +35,13 @@ func maxheight( dh:Int ) -> Int {
     return dh - MENU_BAR_HEIGHT - DOCK_HEIGHT
 }
 
-func center_vertically( dh:Int, wh:Int ) -> Int {
+func center_vertically( dh:Int, _ wh:Int ) -> Int {
     let effective_display_height = maxheight( dh )
     let y_offset_from_menu = ( effective_display_height - wh ) / 2
     return MENU_BAR_HEIGHT + y_offset_from_menu
 }
 
-func centered( dw:Int, dh:Int, ww:Int, wh:Int ) -> CGRect {
+func centered( dw:Int, _ dh:Int, _ ww:Int, _ wh:Int ) -> CGRect {
     let wx = center_horizontally( dw, ww )
     let wy = center_vertically( dh, wh )
     return CGRect( x:wx, y:wy, width:ww, height:wh )
@@ -77,6 +77,15 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
         ]
     }(),
 ];
+
+// RJTODO - In 10.11, they rewrote the AXValue.h header so that you
+// can do things like
+//   AXValueType.CGPoint
+// instead of
+//   AXValueType(rawValue:kAXValueCGPointType )!
+//
+// In XCode 7b5 it appears that to get from CFArray to a Swift array,
+// you have to cast through NSArray.
 
 // The AXUIElement APIs are the assistive / accessibility APIs that
 // actually let you do stuff like move windows around on the screen.
@@ -120,44 +129,17 @@ class RAXWrapper {
     }
 
     var attributeNames:[String] {
-        var out:Unmanaged<CFArray>? = nil
-        var axerr = AXUIElementCopyAttributeNames(
+        var out:CFArray? = nil
+        let axerr = AXUIElementCopyAttributeNames(
             handle,
             &out
         )
-        if AXError(kAXErrorSuccess) != axerr || nil == out {
+        if AXError.Success != axerr || nil == out {
             return [String]()
         }
-        let names = out!.takeRetainedValue() as! [AnyObject]
-        return names.map{ $0 as! String }
+        let names = out as NSArray? as! [String]
+        return names
     }
-}
-
-class RAXProcess: RAXWrapper {
-    private let maxWindows = 20
-    let pid:Int
-        
-    init( _ pid:Int ) {
-        self.pid = pid
-        super.init( handle: AXUIElementCreateApplication( pid_t( self.pid ) ).takeRetainedValue() )
-    }
-
-    lazy var windows:[RAXWindow] = {
-        var out:Unmanaged<CFArray>? = nil
-        var axerr = AXUIElementCopyAttributeValues(
-            self.handle,
-            RAXAttributeConstants.Windows,
-            0,
-            self.maxWindows,
-            &out
-        )
-        if AXError(kAXErrorSuccess) != axerr || nil == out {
-            return [RAXWindow]()
-        }
-
-        let handles = out!.takeRetainedValue() as! [AnyObject]
-        return handles.map{ RAXWindow( $0 as! AXUIElement ) }.filter{ $0.canChange }
-    }()
 }
 
 class RAXWindow: RAXWrapper {
@@ -178,64 +160,91 @@ class RAXWindow: RAXWrapper {
     }
 
     private func getSettable( attr:String ) -> Bool {
-        var settable:Boolean = 0
+        var settable:DarwinBoolean = false
         AXUIElementIsAttributeSettable( handle, attr, &settable )
-        return 0 != settable
+        return Bool(settable)
     }
 
     var position:CGPoint {
         get {
-            var out:Unmanaged<AnyObject>? = nil
+            var out:AnyObject? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Position, &out )
-            if AXError(kAXErrorSuccess) != axerr || nil == out {
+            if AXError.Success != axerr || nil == out {
                 return CGPoint()
             }
-            var value = out!.takeRetainedValue() as! AXValue
+            let value = out as! AXValue
             
             var pt = CGPoint()
-            AXValueGetValue( value, kAXValueCGPointType, &pt )
+            AXValueGetValue( value, AXValueType( rawValue:kAXValueCGPointType )!, &pt )
             return pt
         }
         set {
             var pt = newValue
-            var value:AXValue = AXValueCreate( kAXValueCGPointType, &pt ).takeRetainedValue()
+            let value:AXValue = AXValueCreate( AXValueType( rawValue:kAXValueCGPointType )!, &pt )!.takeRetainedValue()
             AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Position, value )
         }
     }
 
     var size:CGSize {
         get {
-            var out:Unmanaged<AnyObject>? = nil
+            var out:AnyObject? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Size, &out )
-            if AXError(kAXErrorSuccess) != axerr || nil == out {
+            if AXError.Success != axerr || nil == out {
                 return CGSize()
             }
-            var value = out!.takeRetainedValue() as! AXValue
+            let value = out as! AXValue
 
             var size = CGSize()
-            AXValueGetValue( value, kAXValueCGSizeType, &size )
+            AXValueGetValue( value, AXValueType( rawValue:kAXValueCGSizeType )!, &size )
             return size
         }
         set {
             var size = newValue
-            var value:AXValue = AXValueCreate( kAXValueCGSizeType, &size ).takeRetainedValue()
+            let value:AXValue = AXValueCreate( AXValueType( rawValue:kAXValueCGSizeType )!, &size )!.takeRetainedValue()
             AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Size, value )
         }
     }
     
     var title:String {
-        var out:Unmanaged<AnyObject>? = nil
+        var out:AnyObject? = nil
         let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Title, &out )
-        if AXError(kAXErrorSuccess) != axerr || nil == out {
+        if AXError.Success != axerr || nil == out {
             return ""
         }
-        return out!.takeRetainedValue() as! String
+        return out as! String
     }
 }
 
+class RAXProcess: RAXWrapper {
+    private let maxWindows = 20
+    let pid:Int
+        
+    init( _ pid:Int ) {
+        self.pid = pid
+        super.init( handle: AXUIElementCreateApplication( pid_t( self.pid ) ).takeRetainedValue() )
+    }
+
+    lazy var windows:[RAXWindow] = {
+        var out:CFArray? = nil
+        var axerr = AXUIElementCopyAttributeValues(
+            self.handle,
+            RAXAttributeConstants.Windows,
+            0,
+            self.maxWindows,
+            &out
+        )
+        if AXError.Success != axerr || nil == out {
+            return [RAXWindow]()
+        }
+
+        let handles = out as NSArray? as! [AXUIElement]
+        return handles.map{ RAXWindow( $0 ) }.filter{ $0.canChange }
+    }()
+}
+
 func apps() -> [ NSRunningApplication ] {
-    let apps = NSWorkspace.sharedWorkspace().runningApplications as! [ NSRunningApplication ]
-    return apps.filter { contains( procsOfInterest, $0.localizedName! ) }
+    let apps = NSWorkspace.sharedWorkspace().runningApplications 
+    return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
 }
 
 func query() {
@@ -253,7 +262,7 @@ func query() {
 
     var conf = [CGFloat:[String:CGRect]]()
     conf[screenSize.width] = qconf
-    println( conf )
+    print( conf )
 }
 
 func doPositioning() {
@@ -279,7 +288,7 @@ func fixEmacs() {
 }
 
 func main( argv:[String] ) {
-    if contains( argv, "-q" ) {
+    if argv.contains("-q" ) {
         query()
     }
     else {
