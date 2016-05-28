@@ -134,7 +134,7 @@ class RAXWrapper {
             handle,
             &out
         )
-        if AXError.Success != axerr || nil == out {
+        guard .Success == axerr && nil != out else {
             return [String]()
         }
         let names = out as NSArray? as! [String]
@@ -169,7 +169,7 @@ class RAXWindow: RAXWrapper {
         get {
             var out:AnyObject? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Position, &out )
-            if AXError.Success != axerr || nil == out {
+            guard .Success == axerr && nil != out else {
                 return CGPoint()
             }
             let value = out as! AXValue
@@ -189,7 +189,7 @@ class RAXWindow: RAXWrapper {
         get {
             var out:AnyObject? = nil
             let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Size, &out )
-            if AXError.Success != axerr || nil == out {
+            guard .Success == axerr && nil != out else {
                 return CGSize()
             }
             let value = out as! AXValue
@@ -208,7 +208,7 @@ class RAXWindow: RAXWrapper {
     var title:String {
         var out:AnyObject? = nil
         let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Title, &out )
-        if AXError.Success != axerr || nil == out {
+        guard .Success == axerr && nil != out else {
             return ""
         }
         return out as! String
@@ -233,7 +233,7 @@ class RAXProcess: RAXWrapper {
             self.maxWindows,
             &out
         )
-        if AXError.Success != axerr || nil == out {
+        guard .Success == axerr && nil != out else {
             return [RAXWindow]()
         }
 
