@@ -12,7 +12,7 @@ let procsOfInterest = [
     "iCal",
     "GitX",
     "Calendar",
-    "HipChat",
+    "Slack",
     "iTerm",
     "iTunes",
     "Mail",
@@ -54,7 +54,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "standard"    : centered( dw, dh, 1600, 1200 ),
             "EchofonLite" : centered( dw, dh,  489, 1080 ),
             "Things"      : centered( dw, dh,  768,  512 ),
-            "HipChat"     : CGRect( x:0,        y:MENU_BAR_HEIGHT, width:768,  height:maxheight( dh ) ),
+            "Slack"       : CGRect( x:0,        y:MENU_BAR_HEIGHT, width:834,  height:maxheight( dh ) ),
             "iTerm"       : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
             "Messages"    : CGRect( x:996,      y:440,             width:768,  height:512 ),
             "Terminal"    : CGRect( x:694,      y:MENU_BAR_HEIGHT, width:1202, height:1341 ),
@@ -65,7 +65,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
         return [
             "standard"    : CGRect( x:200, y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
             "EchofonLite" : CGRect( x:center_horizontally( dw, 489 ), y:MENU_BAR_HEIGHT, width:498, height:maxheight(dh) ),
-            "HipChat"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:530,  height:maxheight(dh) ),
+            "Slack"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:834,  height:maxheight(dh) ),
         ]
     }(),
     1440 : {
@@ -73,7 +73,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
         return [
             "standard"    : CGRect( x:center_horizontally( dw, 1280 ), y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
             "EchofonLite" : centered( dw, dh, 489, maxheight( dh ) ),
-            "HipChat"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:500,  height:maxheight(dh) ),
+            "Slack"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:834,  height:maxheight(dh) ),
         ]
     }(),
 ];
