@@ -5,7 +5,7 @@ import AppKit
 let screenSize = NSScreen.mainScreen()!.frame.size
 
 let procsOfInterest = [
-    "1Password 4",
+    "1Password 5",
     "Google Chrome",
     "Chromium",
     "EchofonLite",
