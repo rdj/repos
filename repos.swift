@@ -111,13 +111,13 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
 
 // AXAttributeConstants.h uses #defines instead of real constants ...
 struct RAXAttributeConstants {
-    // #define kAXPositionAttribute				CFSTR("AXPosition")
+    // #define kAXPositionAttribute             CFSTR("AXPosition")
     static let Position = "AXPosition"
-    // #define kAXSizeAttribute				CFSTR("AXSize")
+    // #define kAXSizeAttribute             CFSTR("AXSize")
     static let Size = "AXSize"
-    // #define kAXTitleAttribute				CFSTR("AXTitle")
+    // #define kAXTitleAttribute                CFSTR("AXTitle")
     static let Title = "AXTitle"
-    // #define kAXWindowsAttribute				CFSTR("AXWindows")
+    // #define kAXWindowsAttribute              CFSTR("AXWindows")
     static let Windows = "AXWindows"
 }
 
@@ -150,7 +150,7 @@ class RAXWindow: RAXWrapper {
     var canChange:Bool {
         return self.canMove && self.canResize
     }
-    
+
     var canMove:Bool {
         return getSettable( RAXAttributeConstants.Position )
     }
@@ -173,7 +173,7 @@ class RAXWindow: RAXWrapper {
                 return CGPoint()
             }
             let value = out as! AXValue
-            
+
             var pt = CGPoint()
             AXValueGetValue( value, AXValueType( rawValue:kAXValueCGPointType )!, &pt )
             return pt
@@ -204,7 +204,7 @@ class RAXWindow: RAXWrapper {
             AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Size, value )
         }
     }
-    
+
     var title:String {
         var out:AnyObject? = nil
         let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Title, &out )
@@ -218,7 +218,7 @@ class RAXWindow: RAXWrapper {
 class RAXProcess: RAXWrapper {
     private let maxWindows = 20
     let pid:Int
-        
+
     init( _ pid:Int ) {
         self.pid = pid
         super.init( handle: AXUIElementCreateApplication( pid_t( self.pid ) ).takeRetainedValue() )
@@ -243,7 +243,7 @@ class RAXProcess: RAXWrapper {
 }
 
 func apps() -> [ NSRunningApplication ] {
-    let apps = NSWorkspace.sharedWorkspace().runningApplications 
+    let apps = NSWorkspace.sharedWorkspace().runningApplications
     return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
 }
 
