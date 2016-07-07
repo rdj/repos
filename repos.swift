@@ -13,7 +13,7 @@ let procsOfInterest = [
     "GitX",
     "Calendar",
     "Slack",
-    "iTerm",
+    "iTerm2",
     "iTunes",
     "Mail",
     "Mailplane 3",
@@ -55,7 +55,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "EchofonLite" : centered( dw, dh,  489, 1080 ),
             "Things"      : centered( dw, dh,  768,  512 ),
             "Slack"       : CGRect( x:0,        y:MENU_BAR_HEIGHT, width:834,  height:maxheight( dh ) ),
-            "iTerm"       : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
+            "iTerm2"      : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
             "Messages"    : CGRect( x:996,      y:440,             width:768,  height:512 ),
             "Terminal"    : CGRect( x:694,      y:MENU_BAR_HEIGHT, width:1202, height:1341 ),
         ]
