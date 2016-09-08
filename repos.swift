@@ -80,25 +80,12 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
 
 // The AXUIElement APIs are the assistive / accessibility APIs that
 // actually let you do stuff like move windows around on the screen.
-// They are ancient and annoying CF APIs that lack modern annotation
-// so are unwieldy to use from modern (ARC/Swift) code.
 //
-// RAX prefix for wrapping AXUIElement and associated stuff, which are
-// ancient CF APIs that don't even have ARC annotations, so they're a
-// bit unwieldy to use from Swift. Quick review:
+// As of macOS 10.12 SDK they've properly annotated them for ARC so we
+// don't have to manage the refcount ourselves anymore.
 //
-// takeRetainedValue = Create/Copy Rule =
-//                     You called an API that returned a live object
-//                     that hasn't been autoreleased, so it's your job
-//                     to release it.
-//
-// takeUnretainedValue = Get Rule =
-//                       You called an API that returned a live object
-//                       that has been autoreleased, so you don't need
-//                       to worry about it unless it needs to live
-//                       past this runloop, in which case you'll have
-//                       to retain it.
-//
+// They're still pretty unwieldy C APIs, so keeping the wrappers to do
+// all the type coercion etc.
 
 @available( macOS 10.11, * )
 class RAXWrapper {
