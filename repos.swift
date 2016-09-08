@@ -2,7 +2,7 @@
 
 import AppKit
 
-let screenSize = NSScreen.mainScreen()!.frame.size
+let screenSize = NSScreen.main()!.frame.size
 
 let procsOfInterest = [
     "1Password 5",
@@ -27,21 +27,21 @@ let procsOfInterest = [
 let MENU_BAR_HEIGHT = 22
 let DOCK_HEIGHT = 64
 
-func center_horizontally( dw:Int, _ ww:Int ) -> Int {
+func center_horizontally( _ dw:Int, _ ww:Int ) -> Int {
     return ( dw - ww ) / 2
 }
 
-func maxheight( dh:Int ) -> Int {
+func maxheight( _ dh:Int ) -> Int {
     return dh - MENU_BAR_HEIGHT - DOCK_HEIGHT
 }
 
-func center_vertically( dh:Int, _ wh:Int ) -> Int {
+func center_vertically( _ dh:Int, _ wh:Int ) -> Int {
     let effective_display_height = maxheight( dh )
     let y_offset_from_menu = ( effective_display_height - wh ) / 2
     return MENU_BAR_HEIGHT + y_offset_from_menu
 }
 
-func centered( dw:Int, _ dh:Int, _ ww:Int, _ wh:Int ) -> CGRect {
+func centered( _ dw:Int, _ dh:Int, _ ww:Int, _ wh:Int ) -> CGRect {
     let wx = center_horizontally( dw, ww )
     let wy = center_vertically( dh, wh )
     return CGRect( x:wx, y:wy, width:ww, height:wh )
@@ -78,15 +78,6 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
     }(),
 ];
 
-// RJTODO - In 10.11, they rewrote the AXValue.h header so that you
-// can do things like
-//   AXValueType.CGPoint
-// instead of
-//   AXValueType(rawValue:kAXValueCGPointType )!
-//
-// In XCode 7b5 it appears that to get from CFArray to a Swift array,
-// you have to cast through NSArray.
-
 // The AXUIElement APIs are the assistive / accessibility APIs that
 // actually let you do stuff like move windows around on the screen.
 // They are ancient and annoying CF APIs that lack modern annotation
@@ -109,22 +100,11 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
 //                       to retain it.
 //
 
-// AXAttributeConstants.h uses #defines instead of real constants ...
-struct RAXAttributeConstants {
-    // #define kAXPositionAttribute             CFSTR("AXPosition")
-    static let Position = "AXPosition"
-    // #define kAXSizeAttribute             CFSTR("AXSize")
-    static let Size = "AXSize"
-    // #define kAXTitleAttribute                CFSTR("AXTitle")
-    static let Title = "AXTitle"
-    // #define kAXWindowsAttribute              CFSTR("AXWindows")
-    static let Windows = "AXWindows"
-}
-
+@available( macOS 10.11, * )
 class RAXWrapper {
-    private let handle:AXUIElement
+    let handle:AXUIElement
 
-    private init( handle:AXUIElement ) {
+    init( handle:AXUIElement ) {
         self.handle = handle
     }
 
@@ -134,7 +114,7 @@ class RAXWrapper {
             handle,
             &out
         )
-        guard .Success == axerr && nil != out else {
+        guard .success == axerr && nil != out else {
             return [String]()
         }
         let names = out as NSArray? as! [String]
@@ -142,6 +122,7 @@ class RAXWrapper {
     }
 }
 
+@available( macOS 10.11, * )
 class RAXWindow: RAXWrapper {
     init( _ handle:AXUIElement ) {
         super.init( handle: handle )
@@ -152,88 +133,89 @@ class RAXWindow: RAXWrapper {
     }
 
     var canMove:Bool {
-        return getSettable( RAXAttributeConstants.Position )
+        return getSettable( kAXPositionAttribute )
     }
 
     var canResize:Bool {
-        return getSettable( RAXAttributeConstants.Size )
+        return getSettable( kAXSizeAttribute )
     }
 
-    private func getSettable( attr:String ) -> Bool {
+    func getSettable( _ attr:String ) -> Bool {
         var settable:DarwinBoolean = false
-        AXUIElementIsAttributeSettable( handle, attr, &settable )
-        return Bool(settable)
+        AXUIElementIsAttributeSettable( self.handle, attr as NSString, &settable )
+        return settable.boolValue
     }
 
     var position:CGPoint {
         get {
             var out:AnyObject? = nil
-            let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Position, &out )
-            guard .Success == axerr && nil != out else {
+            let axerr = AXUIElementCopyAttributeValue( handle, kAXPositionAttribute as NSString, &out )
+            guard .success == axerr && nil != out else {
                 return CGPoint()
             }
             let value = out as! AXValue
 
             var pt = CGPoint()
-            AXValueGetValue( value, AXValueType( rawValue:kAXValueCGPointType )!, &pt )
+            AXValueGetValue( value, AXValueType.cgPoint, &pt )
             return pt
         }
         set {
             var pt = newValue
-            let value:AXValue = AXValueCreate( AXValueType( rawValue:kAXValueCGPointType )!, &pt )!.takeRetainedValue()
-            AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Position, value )
+            let value:AXValue = AXValueCreate( AXValueType.cgPoint, &pt )!
+            AXUIElementSetAttributeValue( handle, kAXPositionAttribute as NSString, value )
         }
     }
 
     var size:CGSize {
         get {
             var out:AnyObject? = nil
-            let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Size, &out )
-            guard .Success == axerr && nil != out else {
+            let axerr = AXUIElementCopyAttributeValue( handle, kAXSizeAttribute as NSString, &out )
+            guard .success == axerr && nil != out else {
                 return CGSize()
             }
             let value = out as! AXValue
 
             var size = CGSize()
-            AXValueGetValue( value, AXValueType( rawValue:kAXValueCGSizeType )!, &size )
+            AXValueGetValue( value, AXValueType.cgSize, &size )
             return size
         }
         set {
             var size = newValue
-            let value:AXValue = AXValueCreate( AXValueType( rawValue:kAXValueCGSizeType )!, &size )!.takeRetainedValue()
-            AXUIElementSetAttributeValue( handle, RAXAttributeConstants.Size, value )
+            let value:AXValue = AXValueCreate( AXValueType.cgSize, &size )!
+            AXUIElementSetAttributeValue( handle, kAXSizeAttribute as NSString, value )
         }
     }
 
     var title:String {
         var out:AnyObject? = nil
-        let axerr = AXUIElementCopyAttributeValue( handle, RAXAttributeConstants.Title, &out )
-        guard .Success == axerr && nil != out else {
+        let axerr = AXUIElementCopyAttributeValue( handle, kAXTitleAttribute as NSString, &out )
+        guard .success == axerr && nil != out else {
             return ""
         }
         return out as! String
     }
 }
 
+@available( macOS 10.11, * )
 class RAXProcess: RAXWrapper {
-    private let maxWindows = 20
+    let maxWindows = 20
     let pid:Int
 
     init( _ pid:Int ) {
         self.pid = pid
-        super.init( handle: AXUIElementCreateApplication( pid_t( self.pid ) ).takeRetainedValue() )
+        super.init( handle: AXUIElementCreateApplication( pid_t( self.pid ) ) )
     }
 
     lazy var windows:[RAXWindow] = {
         var out:CFArray? = nil
         var axerr = AXUIElementCopyAttributeValues(
             self.handle,
-            RAXAttributeConstants.Windows,
+            kAXWindowsAttribute as NSString,
             0,
             self.maxWindows,
             &out
         )
-        guard .Success == axerr && nil != out else {
+        guard .success == axerr && nil != out else {
             return [RAXWindow]()
         }
 
@@ -242,59 +224,65 @@ class RAXProcess: RAXWrapper {
     }()
 }
 
-func apps() -> [ NSRunningApplication ] {
-    let apps = NSWorkspace.sharedWorkspace().runningApplications
-    return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
-}
+@available( macOS 10.11, * )
+class Repos {
 
-func query() {
-    var qconf = [String:CGRect]()
-    for app in apps() {
-        let proc = RAXProcess( Int(app.processIdentifier) )
-        if proc.windows.count > 0 {
-            let w = proc.windows[0]
-            qconf[app.localizedName!] = CGRectMake(
-                w.position.x, w.position.y,
-                w.size.width, w.size.height
-            )
+    func apps() -> [ NSRunningApplication ] {
+        let apps = NSWorkspace.shared().runningApplications
+        return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
+    }
+
+    func query() {
+        var qconf = [String:CGRect]()
+        for app in apps() {
+            let proc = RAXProcess( Int(app.processIdentifier) )
+            if proc.windows.count > 0 {
+                let w = proc.windows[0]
+                qconf[app.localizedName!] = CGRect(
+                        x:w.position.x, y:w.position.y,
+                        width:w.size.width, height:w.size.height
+                                                )
+            }
+        }
+
+        var conf = [CGFloat:[String:CGRect]]()
+        conf[screenSize.width] = qconf
+        print( conf )
+    }
+
+    func doPositioning() {
+        let conf = configurationForWidth[screenSize.width]!
+        for app in apps() {
+            let rect = conf[app.localizedName!] ?? conf["standard"]!
+            let proc = RAXProcess( Int(app.processIdentifier) )
+            for w in proc.windows {
+                w.position = rect.origin
+                w.size = rect.size
+            }
         }
     }
 
-    var conf = [CGFloat:[String:CGRect]]()
-    conf[screenSize.width] = qconf
-    print( conf )
-}
+    func fixEmacs() {
+        let task = Process()
+        task.launchPath = "/usr/local/bin/emacsclient"
+        task.arguments = [
+            "-e",
+            "(rdj-smartsize-frame-for \(Int(screenSize.width)) \(Int(screenSize.height)))"
+        ]
+        task.launch()
+    }
 
-func doPositioning() {
-    let conf = configurationForWidth[screenSize.width]!
-    for app in apps() {
-        let rect = conf[app.localizedName!] ?? conf["standard"]!
-        let proc = RAXProcess( Int(app.processIdentifier) )
-        for w in proc.windows {
-            w.position = rect.origin
-            w.size = rect.size
+    func main( _ argv:[String] ) {
+        if argv.contains("-q" ) {
+            query()
+        }
+        else {
+            doPositioning()
+            fixEmacs()
         }
     }
 }
 
-func fixEmacs() {
-    let task = NSTask()
-    task.launchPath = "/usr/local/bin/emacsclient"
-    task.arguments = [
-        "-e",
-        "(rdj-smartsize-frame-for \(Int(screenSize.width)) \(Int(screenSize.height)))"
-    ]
-    task.launch()
+if #available( macOS 10.11, * ) {
+    Repos().main( CommandLine.arguments )
 }
-
-func main( argv:[String] ) {
-    if argv.contains("-q" ) {
-        query()
-    }
-    else {
-        doPositioning()
-        fixEmacs()
-    }
-}
-
-main( Process.arguments )
