@@ -2,7 +2,11 @@
 
 import AppKit
 
+#if swift(>=4.0)
+let screenSize = NSScreen.main!.frame.size
+#else
 let screenSize = NSScreen.main()!.frame.size
+#endif
 
 let procsOfInterest = [
     "1Password 5",
@@ -217,7 +221,11 @@ class RAXProcess: RAXWrapper {
 class Repos {
 
     func apps() -> [ NSRunningApplication ] {
+        #if swift(>=4.0)
+        let apps = NSWorkspace.shared.runningApplications
+        #else
         let apps = NSWorkspace.shared().runningApplications
+        #endif
         return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
     }
 
