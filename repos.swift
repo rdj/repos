@@ -6,22 +6,24 @@ let screenSize = NSScreen.main()!.frame.size
 
 let procsOfInterest = [
     "1Password 5",
-    "Google Chrome",
+    "Calendar",
     "Chromium",
     "EchofonLite",
-    "iCal",
+    "Firefox",
     "GitX",
-    "Calendar",
-    "Slack",
-    "iTerm2",
-    "iTunes",
+    "Google Chrome Canary",
+    "Google Chrome",
     "Mail",
     "Mailplane 3",
     "Messages",
     "Safari",
-    "Things",
+    "Slack",
     "Terminal",
+    "Things",
     "Xcode",
+    "iCal",
+    "iTerm2",
+    "iTunes",
 ];
 
 let MENU_BAR_HEIGHT = 22
