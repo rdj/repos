@@ -2,11 +2,7 @@
 
 import AppKit
 
-#if swift(>=4.0)
 let screenSize = NSScreen.main!.frame.size
-#else
-let screenSize = NSScreen.main()!.frame.size
-#endif
 
 let procsOfInterest = [
     "1Password 5",
@@ -93,7 +89,6 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
 // They're still pretty unwieldy C APIs, so keeping the wrappers to do
 // all the type coercion etc.
 
-@available( macOS 10.11, * )
 class RAXWrapper {
     let handle:AXUIElement
 
@@ -115,7 +110,6 @@ class RAXWrapper {
     }
 }
 
-@available( macOS 10.11, * )
 class RAXWindow: RAXWrapper {
     init( _ handle:AXUIElement ) {
         super.init( handle: handle )
@@ -189,7 +183,6 @@ class RAXWindow: RAXWrapper {
     }
 }
 
-@available( macOS 10.11, * )
 class RAXProcess: RAXWrapper {
     let maxWindows = 20
     let pid:Int
@@ -217,15 +210,10 @@ class RAXProcess: RAXWrapper {
     }()
 }
 
-@available( macOS 10.11, * )
 class Repos {
 
     func apps() -> [ NSRunningApplication ] {
-        #if swift(>=4.0)
         let apps = NSWorkspace.shared.runningApplications
-        #else
-        let apps = NSWorkspace.shared().runningApplications
-        #endif
         return apps.filter { procsOfInterest.contains(($0.localizedName!) ) }
     }
 
@@ -280,6 +268,4 @@ class Repos {
     }
 }
 
-if #available( macOS 10.11, * ) {
-    Repos().main( CommandLine.arguments )
-}
+Repos().main( CommandLine.arguments )
