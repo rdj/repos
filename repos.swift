@@ -5,25 +5,22 @@ import AppKit
 let screenSize = NSScreen.main!.frame.size
 
 let procsOfInterest = [
-    "1Password 5",
+    "1Password 7",
     "Calendar",
     "Chromium",
-    "EchofonLite",
     "Firefox",
     "GitX",
     "Google Chrome Canary",
     "Google Chrome",
     "Mail",
-    "Mailplane 3",
+    "Mailplane",
     "Messages",
     "Safari",
     "Slack",
     "Terminal",
     "Things",
     "Xcode",
-    "iCal",
     "iTerm2",
-    "iTunes",
 ];
 
 let MENU_BAR_HEIGHT = 22
@@ -54,7 +51,6 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
         let dw = 2560, dh = 1440
         return [
             "standard"    : centered( dw, dh, 1600, 1200 ),
-            "EchofonLite" : centered( dw, dh,  489, 1080 ),
             "Things"      : centered( dw, dh,  768,  512 ),
             "Slack"       : CGRect( x:0,        y:MENU_BAR_HEIGHT, width:834,  height:maxheight( dh ) ),
             "iTerm2"      : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
@@ -62,19 +58,29 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "Terminal"    : CGRect( x:694,      y:MENU_BAR_HEIGHT, width:1202, height:1341 ),
         ]
     }(),
+    1792 : {
+        let dw = 1792, dh = 1120
+        return [
+            "standard"    : centered( dw, dh, 1600, 1200 ),
+            "Things"      : centered( dw, dh,  768,  512 ),
+            "Slack"       : CGRect( x:0,        y:MENU_BAR_HEIGHT, width:834,  height:maxheight( dh ) ),
+            "iTerm2"      : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
+            "Messages"    : CGRect( x:996,      y:440,             width:768,  height:512 ),
+            "Terminal"    : centered( dw, dh, 1202, 1341 ),
+        ]
+    }(),
     1680 : {
         let dw = 1680, dh = 1050
         return [
             "standard"    : CGRect( x:200, y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
-            "EchofonLite" : CGRect( x:center_horizontally( dw, 489 ), y:MENU_BAR_HEIGHT, width:498, height:maxheight(dh) ),
             "Slack"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:834,  height:maxheight(dh) ),
+            "Terminal"  : CGRect( x:center_horizontally( dw, 1282 ), y:MENU_BAR_HEIGHT, width:1282, height:952 ),
         ]
     }(),
     1440 : {
         let dw = 1440, dh = 900
         return [
             "standard"    : CGRect( x:center_horizontally( dw, 1280 ), y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
-            "EchofonLite" : centered( dw, dh, 489, maxheight( dh ) ),
             "Slack"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:834,  height:maxheight(dh) ),
         ]
     }(),
