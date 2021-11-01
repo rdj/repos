@@ -242,7 +242,9 @@ class Repos {
     }
 
     func doPositioning() {
-        let conf = configurationForWidth[screenSize.width]!
+        guard let conf = configurationForWidth[screenSize.width] else {
+            return
+        }
         for app in apps() {
             let rect = conf[app.localizedName!] ?? conf["standard"]!
             let proc = RAXProcess( Int(app.processIdentifier) )
