@@ -12,6 +12,7 @@ let procsOfInterest = [
     "GitX",
     "Google Chrome Canary",
     "Google Chrome",
+    "kitty",
     "Mail",
     "Mailplane",
     "Messages",
@@ -56,6 +57,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "iTerm2"      : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
             "Messages"    : CGRect( x:996,      y:440,             width:768,  height:512 ),
             "Terminal"    : CGRect( x:694,      y:MENU_BAR_HEIGHT, width:1202, height:1341 ),
+            "kitty"       : CGRect( x:694,      y:MENU_BAR_HEIGHT, width:1202, height:1341 ),
         ]
     }(),
     1792 : {
@@ -67,6 +69,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "iTerm2"      : CGRect( x:dw - 554, y:693,             width:554,  height:388 ),
             "Messages"    : CGRect( x:996,      y:440,             width:768,  height:512 ),
             "Terminal"    : centered( dw, dh, 1202, 1341 ),
+            "kitty"       : centered( dw, dh, 1202, 1341 ),
         ]
     }(),
     1680 : {
@@ -75,6 +78,7 @@ var configurationForWidth:[CGFloat:[String:CGRect]] = [
             "standard"    : CGRect( x:200, y:MENU_BAR_HEIGHT, width:1280, height:maxheight(dh) ),
             "Slack"     : CGRect( x:0,   y:MENU_BAR_HEIGHT, width:834,  height:maxheight(dh) ),
             "Terminal"  : CGRect( x:center_horizontally( dw, 1282 ), y:MENU_BAR_HEIGHT, width:1282, height:952 ),
+            "kitty"     : CGRect( x:center_horizontally( dw, 1282 ), y:MENU_BAR_HEIGHT, width:1282, height:952 ),
         ]
     }(),
     1440 : {
