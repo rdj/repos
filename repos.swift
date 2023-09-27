@@ -1,5 +1,9 @@
 #!/usr/bin/env xcrun swift
 
+// NOTE - After upgrading to macOS 14, swift fails to execute this as
+// a script. However, it will compile with swiftc and the resulting
+// executable works fine.
+
 import AppKit
 
 let screenSize = NSScreen.main!.frame.size
