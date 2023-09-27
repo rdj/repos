@@ -5,7 +5,7 @@ import AppKit
 let screenSize = NSScreen.main!.frame.size
 
 let procsOfInterest = [
-    "1Password 7",
+    "1Password",
     "Calendar",
     "Chromium",
     "Firefox",
