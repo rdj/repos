@@ -280,7 +280,8 @@ class Repos {
         task.launchPath = "/usr/local/bin/emacsclient"
         task.arguments = [
             "-e",
-            "(rdj-smartsize-frame-for \(Int(screenSize.width)) \(Int(screenSize.height)))"
+            //"(rdj-smartsize-frame-for \(Int(screenSize.width)) \(Int(screenSize.height)))"
+            "(rdj-smartsize-frame)"
         ]
         task.launch()
     }
