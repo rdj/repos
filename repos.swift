@@ -1,8 +1,11 @@
-#!/usr/bin/env xcrun swift
+#!/usr/bin/env DYLD_FRAMEWORK_PATH=/System/Library/Frameworks /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift
 
-// NOTE - After upgrading to macOS 14, swift fails to execute this as
-// a script. However, it will compile with swiftc and the resulting
-// executable works fine.
+// NOTE - See https://github.com/apple/swift/issues/68785 for an
+// explanation of the tortured shebang line. Should be fixed in a
+// future swift version.
+//
+// It's also possible to compile this with swiftc and invoke the
+// resulting binary, which will run significantly faster.
 
 import AppKit
 
